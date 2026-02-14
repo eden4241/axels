@@ -1,21 +1,24 @@
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class MemberService {
+	constructor(@InjectModel('Member') private readonly memberModel: Model<null>) {}
 
-    public async signUp(): Promise<string> {
-        return 'Sign up successful!';
-    }
+	public async signUp(): Promise<string> {
+		return 'Sign up successful!';
+	}
 
-    public async login(): Promise<string> {
-        return 'Login successful!';
-    }
+	public async login(): Promise<string> {
+		return 'Login successful!';
+	}
 
-    public async updateMember(): Promise<string> {
-        return 'Update member successful!';
-    }
+	public async updateMember(): Promise<string> {
+		return 'Update member successful!';
+	}
 
-    public async getMember(): Promise<string> {
-        return 'Get member successful!';
-    }
+	public async getMember(): Promise<string> {
+		return 'Get member successful!';
+	}
 }
