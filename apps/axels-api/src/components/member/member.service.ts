@@ -16,19 +16,23 @@ export class MemberService {
 
 	public async signUp(input: MemberInput): Promise<Member> {
 		input.memberPassword = await this.authService.hashPassword(input.memberPassword);
-		try {
+		try { //Duplicate bo'lsa → MongoDB error bo'ladi, shuning uchun Try-catch kerak
 			const result = await this.memberModel.create(input);
-			// TODO: Authentication
+			result.accessToken = await this.authService.createToken(result);
 			return result;
 		} catch (err) {
-			console.log('Error: ServiceModel:', err.message);
+			console.log('Error, Service.model', err.message);
 			throw new BadRequestException(Message.USED_MEMBER_NICK_OR_PHONE);
 		}
 	}
 
 	public async login(input: LoginInput): Promise<Member> {
 		const { memberNick, memberPassword } = input;
-		const response = await this.memberModel.findOne({ memberNick: memberNick }).select('+memberPassword').exec();
+		const response = await this.memberModel
+		.findOne({ memberNick: memberNick })
+		.select('+memberPassword')
+		.exec();
+
 		if (!response || response.memberStatus === MemberStatus.DELETED) {
 			throw new InternalServerErrorException(Message.NO_MEMBER_NICK);
 		} else if (response.memberStatus === MemberStatus.BLOCKED) {
@@ -39,6 +43,7 @@ export class MemberService {
 		if (!isMatch) {
 			throw new InternalServerErrorException(Message.WRONG_PASSWORD);
 		}
+		response.accessToken = await this.authService.createToken(response);
 
 		return response;
 	}
