@@ -10,7 +10,7 @@
   "monorepo": true,
   "root": "apps/axels-api",
   "projects": {
-    "axels": {
+    "axels-api": {
       "type": "application",
       "root": "apps/axels-api",
       "entryFile": "main",
