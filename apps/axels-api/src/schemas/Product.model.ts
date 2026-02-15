@@ -44,11 +44,6 @@ const ProductSchema = new Schema(
 			required: true,
 		},
 
-		propertySquare: {
-			type: Number,
-			required: true,
-		},
-
 		productViews: {
 			type: Number,
 			default: 0,
