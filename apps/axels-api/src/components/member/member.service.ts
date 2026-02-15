@@ -16,7 +16,8 @@ export class MemberService {
 
 	public async signUp(input: MemberInput): Promise<Member> {
 		input.memberPassword = await this.authService.hashPassword(input.memberPassword);
-		try { //Duplicate bo'lsa → MongoDB error bo'ladi, shuning uchun Try-catch kerak
+		try {
+			//Duplicate bo'lsa → MongoDB error bo'ladi, shuning uchun Try-catch kerak
 			const result = await this.memberModel.create(input);
 			result.accessToken = await this.authService.createToken(result);
 			return result;
@@ -28,10 +29,7 @@ export class MemberService {
 
 	public async login(input: LoginInput): Promise<Member> {
 		const { memberNick, memberPassword } = input;
-		const response = await this.memberModel
-		.findOne({ memberNick: memberNick })
-		.select('+memberPassword')
-		.exec();
+		const response = await this.memberModel.findOne({ memberNick: memberNick }).select('+memberPassword').exec();
 
 		if (!response || response.memberStatus === MemberStatus.DELETED) {
 			throw new InternalServerErrorException(Message.NO_MEMBER_NICK);
