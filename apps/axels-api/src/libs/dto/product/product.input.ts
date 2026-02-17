@@ -123,3 +123,36 @@ export class ProductsInquiry {
 	@Field(() => PISearch, { nullable: true })
 	search?: PISearch;
 }
+
+@InputType()
+export class SPISearch {
+	@IsOptional()
+	@Field(() => ProductStatus, { nullable: true })
+	productStatus?: ProductStatus;
+}
+
+@InputType()	
+export class SellerProductsInquiry {
+	@IsNotEmpty()
+	@Min(1)
+	@Field(() => Int)
+	page: number;
+
+	@IsNotEmpty()
+	@Min(1)
+	@Field(() => Int)
+	limit: number;
+
+	@IsOptional()
+	@IsIn(availableProductSorts)
+	@Field(() => String, { nullable: true })
+	sort?: string;
+
+	@IsOptional()
+	@Field(() => Direction, { nullable: true })
+	direction?: Direction;
+
+	@IsOptional()
+	@Field(() => SPISearch, { nullable: true })
+	search?: SPISearch;
+}
