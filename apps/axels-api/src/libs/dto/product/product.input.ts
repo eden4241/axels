@@ -1,8 +1,16 @@
-import { Field, InputType } from '@nestjs/graphql';
-import { IsNotEmpty, IsOptional, Length, Min } from 'class-validator';
+import { Field, InputType, Int } from '@nestjs/graphql';
+import { IsIn, IsNotEmpty, IsOptional, Length, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ObjectId } from 'mongoose';
-import { ProductBrand, ProductMaterial, ProductPurity, ProductSize, ProductStatus, ProductType } from '../../enums/product.enum';
+import {
+	ProductBrand,
+	ProductMaterial,
+	ProductSize,
+	ProductStatus,
+	ProductType,
+} from '../../enums/product.enum';
+import { availableProductSorts } from '../../config';
+import { Direction } from '../../enums/common.enum';
 
 @InputType()
 export class ProductInput {
@@ -14,21 +22,17 @@ export class ProductInput {
 	@Field(() => ProductStatus, { nullable: true })
 	productStatus?: ProductStatus;
 
-    @IsNotEmpty()
+	@IsNotEmpty()
 	@Field(() => ProductMaterial)
 	productMaterial: ProductMaterial;
 
-    @IsNotEmpty()
+	@IsNotEmpty()
 	@Field(() => ProductBrand)
 	productBrand: ProductBrand;
 
-    @IsNotEmpty()
+	@IsNotEmpty()
 	@Field(() => ProductSize)
 	productSize: ProductSize;
-
-	@IsOptional()
-	@Field(() => ProductPurity, { nullable: true })
-	productPurity?: ProductPurity;
 
 	@IsNotEmpty()
 	@Length(3, 100)
@@ -51,4 +55,71 @@ export class ProductInput {
 	productDesc?: string;
 
 	memberId: ObjectId;
+}
+
+@InputType()
+export class PriceRange {
+	@Field(() => Int)
+	start: number;
+
+	@Field(() => Int)
+	end: number;
+}
+	
+
+@InputType()
+export class PISearch {
+	@IsOptional()
+	@Field(() => String, { nullable: true })
+	memberId?: ObjectId;
+
+	@IsOptional()
+	@Field(() => [String], { nullable: true })
+	typeList?: ProductType[];
+
+	@IsOptional()
+	@Field(() => [String], { nullable: true })
+	brandList?: ProductBrand[];
+
+	@IsOptional()
+	@Field(() => [String], { nullable: true })
+	materialList?: ProductMaterial[];
+
+	@IsOptional()
+	@Field(() => [String], { nullable: true })
+	sizeList?: ProductSize[];
+
+	@IsOptional()
+	@Field(() => PriceRange, { nullable: true })
+	priceRange?: PriceRange;
+
+	@IsOptional()
+	@Field(() => String, { nullable: true })
+	text?: string;
+}
+
+@InputType()
+export class ProductsInquiry {
+	@IsNotEmpty()
+	@Min(1)
+	@Field(() => Int)
+	page: number;
+
+	@IsNotEmpty()
+	@Min(1)
+	@Field(() => Int)
+	limit: number;
+
+	@IsOptional()
+	@IsIn(availableProductSorts)
+	@Field(() => String, { nullable: true })
+	sort?: string;
+
+	@IsOptional()
+	@Field(() => Direction, { nullable: true })
+	direction?: Direction;
+
+	@IsOptional()
+	@Field(() => PISearch, { nullable: true })
+	search?: PISearch;
 }

@@ -13,7 +13,6 @@ registerEnumType(ProductType, {
 });
 
 export enum ProductStatus {
-	HOLD = 'HOLD',
 	ACTIVE = 'ACTIVE',
 	SOLD = 'SOLD',
 	DELETE = 'DELETE',
@@ -30,18 +29,6 @@ export enum ProductMaterial {
 registerEnumType(ProductMaterial, {
 	name: 'ProductMaterial',
 });
-
-export enum ProductPurity {
-	K10 = '10K',
-	K14 = '14K',
-	K18 = '18K',
-	K22 = '22K',
-	K24 = '24K',
-}
-registerEnumType(ProductPurity, {
-	name: 'ProductPurity',
-});
-
 
 export enum ProductBrand {
 	ROLLIAGE = 'ROLLIAGE',

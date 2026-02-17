@@ -1,7 +1,7 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { ObjectId } from 'mongoose';
-import { ProductBrand, ProductMaterial, ProductPurity, ProductSize, ProductStatus, ProductType } from '../../enums/product.enum';
-import { Member } from '../member/member';
+import { ProductBrand, ProductMaterial, ProductSize, ProductStatus, ProductType } from '../../enums/product.enum';
+import { Member, TotalCounter } from '../member/member';
 
 @ObjectType()
 export class Product {
@@ -22,9 +22,6 @@ export class Product {
 
 	@Field(() => ProductSize)
 	productSize: ProductSize;
-
-	@Field(() => ProductPurity, { nullable: true })
-	productPurity?: ProductPurity;
 
 	@Field(() => String)
 	productTitle: string;
@@ -78,4 +75,13 @@ export class Product {
 	
 	// @Field(() => Member, {nullable: true})
 	// memberData?: Member;
+}
+
+@ObjectType()
+export class Products {
+	@Field(() => [Product])
+	list: Product[];
+
+	@Field(() => [TotalCounter], { nullable: true })
+	metaCounter: TotalCounter[];
 }

@@ -3,15 +3,16 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
 import { AuthService } from '../auth/auth.service';
 import { ViewService } from '../view/view.service';
-import { Product } from '../../libs/dto/product/product';
-import { Message } from '../../libs/enums/common.enum';
-import { ProductInput } from '../../libs/dto/product/product.input';
+import { Product, Products } from '../../libs/dto/product/product';
+import { Direction, Message } from '../../libs/enums/common.enum';
+import { ProductInput, ProductsInquiry } from '../../libs/dto/product/product.input';
 import { MemberService } from '../member/member.service';
 import { StatisticModifier, T } from '../../libs/types/common';
 import { ProductStatus } from '../../libs/enums/product.enum';
 import { ViewGroup } from '../../libs/enums/view.enum';
 import { ProductUpdate } from '../../libs/dto/product/product.update';
 import moment from 'moment';
+import { lookupMember, shapeIntoMongooseObject } from '../../libs/config';
 
 @Injectable()
 export class ProductService {
@@ -82,6 +83,50 @@ export class ProductService {
 			});
 		}
 		return result;
+	}
+
+	public async getProducts(memberId: ObjectId, input: ProductsInquiry): Promise<Products> {
+		const match: T = { productStatus: ProductStatus.ACTIVE };
+		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
+
+		this.shapeMatchQuery(match, input);
+		console.log('match:', match);
+
+		const result = await this.productModel
+			.aggregate([
+				{ $match: match },
+				{ $sort: sort },
+				{
+					$facet: {
+						list: [
+							{ $skip: (input.page - 1) * input.limit },
+							{ $limit: input.limit },
+							//meLiked++
+							lookupMember,
+							{ $unwind: '$memberData' },
+						],
+						metaCounter: [{ $count: 'total' }],
+					},
+				},
+			])
+			.exec();
+		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+		return result[0];
+	}
+
+	private shapeMatchQuery(match: T, input: ProductsInquiry): void {
+		const { memberId, typeList, brandList, materialList, sizeList, priceRange, text } = input.search;
+
+		if (memberId) match.memberId = shapeIntoMongooseObject(memberId);
+		if (typeList) match.productType = { $in: typeList };
+		if (brandList) match.productBrand = { $in: brandList };
+		if (materialList) match.productMaterial = { $in: materialList };
+		if (sizeList) match.productSize = { $in: sizeList };
+
+		if (priceRange) match.productPrice = { $gte: priceRange.start, $lte: priceRange.end };
+
+		if (text) match.productTitle = { $regex: new RegExp(text, 'i') };
 	}
 
 	public async productStatsEditor(input: StatisticModifier): Promise<Product> {

@@ -1,7 +1,7 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { ProductService } from './product.service';
-import { Product } from '../../libs/dto/product/product';
-import { ProductInput } from '../../libs/dto/product/product.input';
+import { Product, Products } from '../../libs/dto/product/product';
+import { ProductInput, ProductsInquiry } from '../../libs/dto/product/product.input';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { MemberType } from '../../libs/enums/member.enum';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -47,4 +47,14 @@ export class ProductResolver {
 		input._id = shapeIntoMongooseObject(input._id);
 		return await this.productService.updateProduct(memberId, input);
 	}
+
+    @UseGuards(WithoutGuard)
+    @Query((returns) => Products)
+    public async getProducts(
+        @Args('input') input: ProductsInquiry,
+        @AuthMember('_id') memberId: ObjectId,
+    ): Promise<Products> {
+        console.log('Query: getProducts');
+        return await this.productService.getProducts(memberId, input);
+    }
 }
