@@ -10,6 +10,8 @@ import { MemberService } from '../member/member.service';
 import { StatisticModifier, T } from '../../libs/types/common';
 import { ProductStatus } from '../../libs/enums/product.enum';
 import { ViewGroup } from '../../libs/enums/view.enum';
+import { ProductUpdate } from '../../libs/dto/product/product.update';
+import moment from 'moment';
 
 @Injectable()
 export class ProductService {
@@ -56,6 +58,30 @@ export class ProductService {
 		}
 		targetProduct.memberData = await this.memberService.getMember(null, targetProduct.memberId);
 		return targetProduct;
+	}
+
+	public async updateProduct(memberId: ObjectId, input: ProductUpdate): Promise<Product> {
+		let { productStatus, soldAt, deletedAt } = input;
+		const search: T = {
+			_id: input._id,
+			memberId: memberId,
+			productStatus: ProductStatus.ACTIVE,
+		};
+
+		if (productStatus === ProductStatus.SOLD) soldAt = moment().toDate();
+		else if (productStatus === ProductStatus.DELETE) deletedAt = moment().toDate();
+
+		const result = await this.productModel.findByIdAndUpdate(search, input, { new: true }).exec();
+		if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
+
+		if (soldAt || deletedAt) {
+			await this.memberService.memberStatsEditor({
+				_id: memberId,
+				targetKey: 'memberProducts',
+				modifier: -1,
+			});
+		}
+		return result;
 	}
 
 	public async productStatsEditor(input: StatisticModifier): Promise<Product> {
