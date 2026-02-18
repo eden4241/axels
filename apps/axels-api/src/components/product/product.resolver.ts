@@ -1,7 +1,12 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { ProductService } from './product.service';
 import { Product, Products } from '../../libs/dto/product/product';
-import { AllProductsInquiry, ProductInput, ProductsInquiry, SellerProductsInquiry } from '../../libs/dto/product/product.input';
+import {
+	AllProductsInquiry,
+	ProductInput,
+	ProductsInquiry,
+	SellerProductsInquiry,
+} from '../../libs/dto/product/product.input';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { MemberType } from '../../libs/enums/member.enum';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -69,26 +74,33 @@ export class ProductResolver {
 		return await this.productService.getSellerProducts(memberId, input);
 	}
 
-    /* ADMIN */
-    @Roles(MemberType.ADMIN)
-    @UseGuards(RolesGuard)
-    @Query((returns) => Products)
-    public async getAllProductsByAdmin(
-        @Args('input') input: AllProductsInquiry,
-        @AuthMember('_id') memberId: ObjectId,
-    ): Promise<Products> {
-        console.log('Query: getProductsByAdmin');
-        return await this.productService.getAllProductsByAdmin(input);
-    }
+	/* ADMIN */
+	@Roles(MemberType.ADMIN)
+	@UseGuards(RolesGuard)
+	@Query((returns) => Products)
+	public async getAllProductsByAdmin(
+		@Args('input') input: AllProductsInquiry,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<Products> {
+		console.log('Query: getProductsByAdmin');
+		return await this.productService.getAllProductsByAdmin(input);
+	}
 
-    @Roles(MemberType.ADMIN)
-    @UseGuards(RolesGuard)
-    @Mutation((returns) => Product)
-    public async updateProductByAdmin(
-        @Args('input') input: ProductUpdate
-    ): Promise<Product> {
-        console.log('Mutation: updateProductByAdmin');
-        input._id = shapeIntoMongooseObject(input._id);
-        return await this.productService.updateProductByAdmin(input);
-    }
+	@Roles(MemberType.ADMIN)
+	@UseGuards(RolesGuard)
+	@Mutation((returns) => Product)
+	public async updateProductByAdmin(@Args('input') input: ProductUpdate): Promise<Product> {
+		console.log('Mutation: updateProductByAdmin');
+		input._id = shapeIntoMongooseObject(input._id);
+		return await this.productService.updateProductByAdmin(input);
+	}
+
+	@Roles(MemberType.ADMIN)
+	@UseGuards(RolesGuard)
+	@Mutation((returns) => Product)
+	public async removeProductByAdmin(@Args('productId') input: string): Promise<Product> {
+		console.log('Mutation: removeProductByAdmin');
+		const productId = shapeIntoMongooseObject(input);
+		return await this.productService.removeProductByAdmin(productId);
+	}
 }

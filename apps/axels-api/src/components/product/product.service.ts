@@ -206,10 +206,10 @@ export class ProductService {
 
 	public async updateProductByAdmin(input: ProductUpdate): Promise<Product> {
 		let { productStatus, soldAt, deletedAt } = input;
-		const search: T = { 
-            _id: input._id, 
-            productStatus: ProductStatus.ACTIVE 
-        };
+		const search: T = {
+			_id: input._id,
+			productStatus: ProductStatus.ACTIVE,
+		};
 
 		if (productStatus === ProductStatus.SOLD) soldAt = moment().toDate();
 		else if (productStatus === ProductStatus.DELETE) deletedAt = moment().toDate();
@@ -217,14 +217,21 @@ export class ProductService {
 		const result = await this.productModel.findOneAndUpdate(search, input, { new: true }).exec();
 		if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
 
-        if (soldAt || deletedAt) {
-            await this.memberService.memberStatsEditor({
-                _id: result.memberId,
-                targetKey: 'memberProducts',
-                modifier: -1,
-            });
-        }
+		if (soldAt || deletedAt) {
+			await this.memberService.memberStatsEditor({
+				_id: result.memberId,
+				targetKey: 'memberProducts',
+				modifier: -1,
+			});
+		}
 
+		return result;
+	}
+
+	public async removeProductByAdmin(productId: ObjectId): Promise<Product> {
+		const search: T = { _id: productId, productStatus: ProductStatus.DELETE };
+		const result = await this.productModel.findOneAndDelete(search).exec();
+		if (!result) throw new InternalServerErrorException(Message.REMOVE_FAILED);
 		return result;
 	}
 }
