@@ -1,7 +1,7 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { ProductService } from './product.service';
 import { Product, Products } from '../../libs/dto/product/product';
-import { ProductInput, ProductsInquiry, SellerProductsInquiry } from '../../libs/dto/product/product.input';
+import { AllProductsInquiry, ProductInput, ProductsInquiry, SellerProductsInquiry } from '../../libs/dto/product/product.input';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { MemberType } from '../../libs/enums/member.enum';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -68,4 +68,16 @@ export class ProductResolver {
 		console.log('Query: getProductsByMember');
 		return await this.productService.getSellerProducts(memberId, input);
 	}
+
+    /* ADMIN */
+    @Roles(MemberType.ADMIN)
+    @UseGuards(RolesGuard)
+    @Query((returns) => Products)
+    public async getAllProductsByAdmin(
+        @Args('input') input: AllProductsInquiry,
+        @AuthMember('_id') memberId: ObjectId,
+    ): Promise<Products> {
+        console.log('Query: getProductsByAdmin');
+        return await this.productService.getAllProductsByAdmin(input);
+    }
 }

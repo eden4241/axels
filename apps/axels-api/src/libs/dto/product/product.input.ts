@@ -156,3 +156,49 @@ export class SellerProductsInquiry {
 	@Field(() => SPISearch, { nullable: true })
 	search?: SPISearch;
 }
+
+@InputType()
+export class ALPISearch {
+	@IsOptional()
+	@Field(() => ProductStatus, { nullable: true })
+	productStatus?: ProductStatus;
+
+	@IsOptional()
+	@Field(() => [ProductType], { nullable: true })
+	typeList?: ProductType[];
+
+	@IsOptional()
+	@Field(() => [ProductBrand], { nullable: true })
+	brandList?: ProductBrand[];
+
+	@IsOptional()
+	@Field(() => [ProductMaterial], { nullable: true })
+	materialList?: ProductMaterial[];
+}
+
+
+@InputType()
+export class AllProductsInquiry {
+	@IsNotEmpty()
+	@Min(1)
+	@Field(() => Int)
+	page: number;
+
+	@IsNotEmpty()
+	@Min(1)
+	@Field(() => Int)
+	limit: number;
+
+	@IsOptional()
+	@IsIn(availableProductSorts)
+	@Field(() => String, { nullable: true })
+	sort?: string;
+
+	@IsOptional()
+	@Field(() => Direction, { nullable: true })
+	direction?: Direction;
+
+	@IsOptional()
+	@Field(() => ALPISearch, { nullable: true })
+	search?: ALPISearch;
+}
