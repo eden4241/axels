@@ -6,7 +6,12 @@ import { AuthService } from '../auth/auth.service';
 import { ViewService } from '../view/view.service';
 import { Product, Products } from '../../libs/dto/product/product';
 import { Direction, Message } from '../../libs/enums/common.enum';
-import { AllProductsInquiry, ProductInput, ProductsInquiry, SellerProductsInquiry } from '../../libs/dto/product/product.input';
+import {
+	AllProductsInquiry,
+	ProductInput,
+	ProductsInquiry,
+	SellerProductsInquiry,
+} from '../../libs/dto/product/product.input';
 import { MemberService } from '../member/member.service';
 import { StatisticModifier, T } from '../../libs/types/common';
 import { ProductStatus } from '../../libs/enums/product.enum';
@@ -166,33 +171,60 @@ export class ProductService {
 		return await this.productModel.findByIdAndUpdate(_id, { $inc: { [targetKey]: modifier } }, { new: true }).exec();
 	}
 
-    /* ADMIN */
-    public async getAllProductsByAdmin(input: AllProductsInquiry): Promise<Products> {
-        const { productStatus, typeList, brandList, materialList } = input.search;
-        const match: T = {};
-        const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
+	/* ADMIN */
+	public async getAllProductsByAdmin(input: AllProductsInquiry): Promise<Products> {
+		const { productStatus, typeList, brandList, materialList } = input.search;
+		const match: T = {};
+		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
 
-        if (productStatus) match.productStatus = productStatus;
-        if (typeList) match.productType = { $in: typeList };
-        if (brandList) match.productBrand = { $in: brandList };
-        if (materialList) match.productMaterial = { $in: materialList };
+		if (productStatus) match.productStatus = productStatus;
+		if (typeList) match.productType = { $in: typeList };
+		if (brandList) match.productBrand = { $in: brandList };
+		if (materialList) match.productMaterial = { $in: materialList };
 
-        const result = await this.productModel.aggregate([
-            { $match: match },
-            { $sort: sort },
-            { $facet: {
-                list: [
-                    { $skip: (input.page - 1) * input.limit },
-                    { $limit: input.limit },
-                    lookupMember,
-                    { $unwind: '$memberData' },
-                ],
-                metaCounter: [{ $count: 'total' }],
-            }},
-        ])
-        .exec();
-        if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
-        
-        return result[0];
-    }
+		const result = await this.productModel
+			.aggregate([
+				{ $match: match },
+				{ $sort: sort },
+				{
+					$facet: {
+						list: [
+							{ $skip: (input.page - 1) * input.limit },
+							{ $limit: input.limit },
+							lookupMember,
+							{ $unwind: '$memberData' },
+						],
+						metaCounter: [{ $count: 'total' }],
+					},
+				},
+			])
+			.exec();
+		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+		return result[0];
+	}
+
+	public async updateProductByAdmin(input: ProductUpdate): Promise<Product> {
+		let { productStatus, soldAt, deletedAt } = input;
+		const search: T = { 
+            _id: input._id, 
+            productStatus: ProductStatus.ACTIVE 
+        };
+
+		if (productStatus === ProductStatus.SOLD) soldAt = moment().toDate();
+		else if (productStatus === ProductStatus.DELETE) deletedAt = moment().toDate();
+
+		const result = await this.productModel.findOneAndUpdate(search, input, { new: true }).exec();
+		if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
+
+        if (soldAt || deletedAt) {
+            await this.memberService.memberStatsEditor({
+                _id: result.memberId,
+                targetKey: 'memberProducts',
+                modifier: -1,
+            });
+        }
+
+		return result;
+	}
 }
