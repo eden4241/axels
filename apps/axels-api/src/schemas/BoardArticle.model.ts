@@ -53,4 +53,6 @@ const BoardArticleSchema = new Schema(
 	{ timestamps: true, collection: 'boardArticles' },
 );
 
+BoardArticleSchema.index({ articleCategory: 1, articleTitle: 1, articleContent: 1 }, { unique: true });
+
 export default BoardArticleSchema;
