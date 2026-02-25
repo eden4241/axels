@@ -8,7 +8,7 @@ import { ViewModule } from '../view/view.module';
 import { MemberModule } from '../member/member.module';
 
 @Module({
-  imports: [
+	imports: [
 		MongooseModule.forFeature([
 			{
 				name: 'Product',
@@ -17,8 +17,9 @@ import { MemberModule } from '../member/member.module';
 		]),
 		AuthModule,
 		ViewModule,
-    MemberModule
+		MemberModule,
 	],
-  providers: [ProductResolver, ProductService]
+	providers: [ProductResolver, ProductService],
+	exports: [ProductService]
 })
 export class ProductModule {}

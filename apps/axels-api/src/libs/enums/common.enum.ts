@@ -19,6 +19,7 @@ export enum Message {
 	NOT_ALLOWED_REQUEST = 'Not Allowed Request!',
 	PROVIDE_ALLOWED_FORMAT = 'Please provide jpg, jpeg or png images!',
 	SELF_SUBSCRIPTION_DENIED = 'Self subscription is denied!',
+	COMMENT_ALREADY_EXISTS = 'You have already commented on this item!',
 }
 
 export enum Direction {
