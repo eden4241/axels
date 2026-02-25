@@ -4,7 +4,11 @@ import { BoardArticle, BoardArticles } from '../../libs/dto/board-article/board-
 import { InjectModel } from '@nestjs/mongoose';
 import { MemberService } from '../member/member.service';
 import { ViewService } from '../view/view.service';
-import { AllBoardArticlesInquiry, BoardArticleInput, BoardArticlesInquiry } from '../../libs/dto/board-article/board-article.input';
+import {
+	AllBoardArticlesInquiry,
+	BoardArticleInput,
+	BoardArticlesInquiry,
+} from '../../libs/dto/board-article/board-article.input';
 import { Direction, Message } from '../../libs/enums/common.enum';
 import { StatisticModifier, T } from '../../libs/types/common';
 import { BoardArticleStatus } from '../../libs/enums/board-article.enum';
@@ -62,6 +66,8 @@ export class BoardArticleService {
 			}
 
 			//meLiked
+			const likeInput = { memberId: memberId, likeRefId: articleId, likeGroup: LikeGroup.ARTICLE };
+			targetBoardArticle.meLiked = await this.likeService.checkLikeExistance(likeInput);
 		}
 		targetBoardArticle.memberData = await this.memberService.getMember(null, targetBoardArticle.memberId);
 		return targetBoardArticle;
@@ -136,8 +142,12 @@ export class BoardArticleService {
 		};
 
 		const modifier: number = await this.likeService.toggleLike(input);
-		const result = await this.boardArticleStatsEditor({ _id: likeRefId, targetKey: 'articleLikes', modifier: modifier });
-		target.articleLikes += modifier;	
+		const result = await this.boardArticleStatsEditor({
+			_id: likeRefId,
+			targetKey: 'articleLikes',
+			modifier: modifier,
+		});
+		target.articleLikes += modifier;
 		if (!result) throw new InternalServerErrorException(Message.SOMETHING_WENT_WRONG);
 		return target;
 	}
@@ -146,28 +156,29 @@ export class BoardArticleService {
 
 	public async getAllBoardArticlesByAdmin(input: AllBoardArticlesInquiry): Promise<BoardArticles> {
 		const { articleCategory, articleStatus } = input.search;
-		const match: T = { };
+		const match: T = {};
 		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
 
 		if (articleStatus) match.articleStatus = articleStatus;
 		if (articleCategory) match.articleCategory = articleCategory;
 
-		const result = await this.boardArticleModel.aggregate([
-			{ $match: match },
-			{ $sort: sort },
-			{
-				$facet: {
-					list: [
-						{ $skip: (input.page - 1) * input.limit },
-						{ $limit: input.limit },
-						lookupMember,
-						{ $unwind: '$memberData' },
-					],
-					metaCounter: [{ $count: 'total' }],
+		const result = await this.boardArticleModel
+			.aggregate([
+				{ $match: match },
+				{ $sort: sort },
+				{
+					$facet: {
+						list: [
+							{ $skip: (input.page - 1) * input.limit },
+							{ $limit: input.limit },
+							lookupMember,
+							{ $unwind: '$memberData' },
+						],
+						metaCounter: [{ $count: 'total' }],
+					},
 				},
-			},
-		])
-		.exec();
+			])
+			.exec();
 		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 		return result[0];
 	}

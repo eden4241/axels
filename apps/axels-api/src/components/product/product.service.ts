@@ -65,6 +65,8 @@ export class ProductService {
 			}
 
 			//meLiked++
+			const likeInput = { memberId: memberId, likeRefId: productId, likeGroup: LikeGroup.PRODUCT };
+			targetProduct.meLiked = await this.likeService.checkLikeExistance(likeInput);
 		}
 		targetProduct.memberData = await this.memberService.getMember(null, targetProduct.memberId);
 		return targetProduct;
