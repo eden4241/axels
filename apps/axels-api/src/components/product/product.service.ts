@@ -18,6 +18,9 @@ import { ProductStatus } from '../../libs/enums/product.enum';
 import { ViewGroup } from '../../libs/enums/view.enum';
 import { ProductUpdate } from '../../libs/dto/product/product.update';
 import { lookupMember, shapeIntoMongooseObject } from '../../libs/config';
+import { LikeInput } from '../../libs/dto/like/like.input';
+import { LikeGroup } from '../../libs/enums/like.enum';
+import { LikeService } from '../like/like.service';
 
 @Injectable()
 export class ProductService {
@@ -26,6 +29,7 @@ export class ProductService {
 		private authService: AuthService,
 		private viewService: ViewService,
 		private memberService: MemberService,
+		private likeService: LikeService,
 	) {}
 
 	public async createProduct(input: ProductInput): Promise<Product> {
@@ -169,6 +173,25 @@ export class ProductService {
 	public async productStatsEditor(input: StatisticModifier): Promise<Product> {
 		const { targetKey, modifier, _id } = input;
 		return await this.productModel.findByIdAndUpdate(_id, { $inc: { [targetKey]: modifier } }, { new: true }).exec();
+	}
+
+	public async likeTargetProduct(memberId: ObjectId, likeRefId: ObjectId): Promise<Product> {
+		const target: Product = await this.productModel
+			.findOne({ _id: likeRefId, productStatus: ProductStatus.ACTIVE })
+			.exec();
+		if (!target) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+		const input: LikeInput = {
+			memberId: memberId,
+			likeRefId: likeRefId,
+			likeGroup: LikeGroup.PRODUCT,
+		};
+
+		const modifier: number = await this.likeService.toggleLike(input);
+		const result = await this.productStatsEditor({ _id: likeRefId, targetKey: 'productLikes', modifier: modifier });
+		target.productLikes += modifier;
+		if (!result) throw new InternalServerErrorException(Message.SOMETHING_WENT_WRONG);
+		return target;
 	}
 
 	/* ADMIN */

@@ -16,6 +16,7 @@ import { WithoutGuard } from '../auth/guards/without.guard';
 import { shapeIntoMongooseObject } from '../../libs/config';
 import { UseGuards } from '@nestjs/common';
 import { ProductUpdate } from '../../libs/dto/product/product.update';
+import { AuthGuard } from '../auth/guards/auth.guard';
 
 @Resolver()
 export class ProductResolver {
@@ -72,6 +73,17 @@ export class ProductResolver {
 	): Promise<Products> {
 		console.log('Query: getProductsByMember');
 		return await this.productService.getSellerProducts(memberId, input);
+	}
+
+	@UseGuards(AuthGuard)
+	@Mutation(() => Product)
+	public async likeTargetProduct(
+		@Args('productId') input: string,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<Product> {
+		console.log('Mutation: likeTargetProduct');
+		const likeRefId = shapeIntoMongooseObject(input);
+		return await this.productService.likeTargetProduct(memberId, likeRefId);
 	}
 
 	/* ADMIN */
