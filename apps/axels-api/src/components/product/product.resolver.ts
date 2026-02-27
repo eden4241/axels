@@ -75,15 +75,15 @@ export class ProductResolver {
 		return await this.productService.getFavorites(memberId, input);
 	}
 
-	// @UseGuards(AuthGuard)
-	// @Query((returns) => Products)
-	// public async getVisited(
-	// 	@Args('input') input: OrdinaryInquiry,
-	// 	@AuthMember('_id') memberId: ObjectId,
-	// ): Promise<Products> {
-	// 	console.log('Query: getVisited');
-	// 	return await this.productService.getVisited(memberId, input);
-	// }
+	@UseGuards(AuthGuard)
+	@Query((returns) => Products)
+	public async getVisited(
+		@Args('input') input: OrdinaryInquiry,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<Products> {
+		console.log('Query: getVisited');
+		return await this.productService.getVisited(memberId, input);
+	}
 
 	@Roles(MemberType.SELLER)
 	@UseGuards(RolesGuard)

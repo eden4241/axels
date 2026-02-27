@@ -146,9 +146,9 @@ export class ProductService {
 		return await this.likeService.getFavoriteProducts(memberId, input);
 	}
 
-	// public async getVisited(memberId: ObjectId, input: OrdinaryInquiry): Promise<Properties> {
-	// 	return await this.viewService.getVisitedProperties(memberId, input);
-	// }
+	public async getVisited(memberId: ObjectId, input: OrdinaryInquiry): Promise<Products> {
+		return await this.viewService.getVisitedProducts(memberId, input);
+	}
 
 	public async getSellerProducts(memberId: ObjectId, input: SellerProductsInquiry): Promise<Products> {
 		const { productStatus } = input.search;
