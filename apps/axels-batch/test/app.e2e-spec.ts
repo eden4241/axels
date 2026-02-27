@@ -1,14 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AxelsBatchModule } from './../src/axels-batch.module';
+import { BatchModule } from '../src/batch.module';
 
 describe('AxelsBatchController (e2e)', () => {
   let app: INestApplication;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AxelsBatchModule],
+      imports: [BatchModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();

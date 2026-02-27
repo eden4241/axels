@@ -44,7 +44,7 @@ export class ViewService {
             },
             { $unwind: '$visitedProduct' },
             {
-                $facet: {  //productni hosil qilgan agent
+                $facet: {  //productni hosil qilgan seller
                     list: [
                         { $skip: (page - 1) * limit },
                         { $limit: limit },
