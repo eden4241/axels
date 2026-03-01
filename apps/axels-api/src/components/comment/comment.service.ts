@@ -1,5 +1,5 @@
 import { lookupMember } from './../../libs/config';
-import { BadRequestException, Injectable, InternalServerErrorException, OnModuleInit } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, InternalServerErrorException, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
 import { MemberService } from '../member/member.service';
@@ -118,6 +118,45 @@ export class CommentService implements OnModuleInit {
 		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
 		return result[0];
+	}
+
+	/** Oddiy user faqat o'zi yozgan commentni o'chiradi */
+	public async removeComment(memberId: ObjectId, commentId: ObjectId): Promise<Comment> {
+		const comment = await this.commentModel.findOne({
+			_id: commentId,
+			memberId,
+			commentStatus: CommentStatus.ACTIVE,
+		});
+		if (!comment) {
+			throw new ForbiddenException(Message.NOT_ALLOWED_REQUEST);
+		}
+		const result = await this.commentModel.findByIdAndDelete(commentId);
+		if (!result) throw new InternalServerErrorException(Message.REMOVE_FAILED);
+
+		switch (result.commentGroup) {
+			case CommentGroup.PRODUCT:
+				await this.productService.productStatsEditor({
+					_id: result.commentRefId,
+					targetKey: 'productComments',
+					modifier: -1,
+				});
+				break;
+			case CommentGroup.ARTICLE:
+				await this.boardArticleService.boardArticleStatsEditor({
+					_id: result.commentRefId,
+					targetKey: 'articleComments',
+					modifier: -1,
+				});
+				break;
+			case CommentGroup.MEMBER:
+				await this.memberService.memberStatsEditor({
+					_id: result.commentRefId,
+					targetKey: 'memberComments',
+					modifier: -1,
+				});
+				break;
+		}
+		return result;
 	}
 
 	/** Admin */

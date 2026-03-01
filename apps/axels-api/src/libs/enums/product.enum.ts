@@ -1,12 +1,13 @@
 import { registerEnumType } from '@nestjs/graphql';
 
 export enum ProductType {
-	EARRING = 'EARRING',
-	NECKLACE = 'NECKLACE',
-	BRACELET = 'BRACELET',
 	RING = 'RING',
-	BROOCH = 'BROOCH',
-
+	NECKLACE = 'NECKLACE',
+	EARRING = 'EARRING',
+	BRACELET = 'BRACELET',
+	DIAMOND = 'DIAMOND',
+	GIFT = 'GIFT',
+	WEDDING_RING = 'WEDDING_RING',
 }
 registerEnumType(ProductType, {
 	name: 'ProductType',
@@ -23,8 +24,17 @@ registerEnumType(ProductStatus, {
 
 export enum ProductMaterial {
 	GOLD = 'GOLD',
-	PLATINUM = 'PLATINUM',
 	SILVER = 'SILVER',
+	PLATINUM = 'PLATINUM',
+	WHITE_GOLD = 'WHITE_GOLD',
+	ROSE_GOLD = 'ROSE_GOLD',
+	STERLING_SILVER = 'STERLING_SILVER',
+	DIAMOND = 'DIAMOND',
+	GEMSTONE = 'GEMSTONE',
+	PEARL = 'PEARL',
+	TITANIUM = 'TITANIUM',
+	BRONZE = 'BRONZE',
+	CRYSTAL = 'CRYSTAL',
 }
 registerEnumType(ProductMaterial, {
 	name: 'ProductMaterial',
@@ -37,19 +47,26 @@ export enum ProductBrand {
 	ROMAN_PAUL = 'ROMAN PAUL',
 	KS_SILVERWORKS = 'KS SILVERWORKS',
 	LOVE_EXECUTIVE = 'LOVE EXECUTIVE',
+	CARTIER = 'CARTIER',
+	BVLGARI = 'BVLGARI',
+	TIFFANY = 'TIFFANY',
+	VAANCLEEF = 'VAANCLEEF',
+	GRAFF = 'GRAFF',
+	HARRY_WINSTON = 'HARRY WINSTON',
+	PANDORA = 'PANDORA',
 }
 registerEnumType(ProductBrand, {
 	name: 'ProductBrand',
 });
 
- export enum ProductSize {
+export enum ProductSize {
 	S = 'S',
 	M = 'M',
 	L = 'L',
 	XS = 'XS',
 	XL = 'XL',
 	XXL = 'XXL',
- }
- registerEnumType(ProductSize, {
+}
+registerEnumType(ProductSize, {
 	name: 'ProductSize',
- });
+});

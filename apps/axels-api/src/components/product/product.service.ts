@@ -182,6 +182,14 @@ export class ProductService {
 		return result[0];
 	}
 
+	/** Lightweight check for cart/order: product exists and is ACTIVE. */
+	public async findActiveById(productId: ObjectId): Promise<Product | null> {
+		return this.productModel
+			.findOne({ _id: productId, productStatus: ProductStatus.ACTIVE })
+			.lean()
+			.exec();
+	}
+
 	public async productStatsEditor(input: StatisticModifier): Promise<Product> {
 		const { targetKey, modifier, _id } = input;
 		return await this.productModel.findByIdAndUpdate(_id, { $inc: { [targetKey]: modifier } }, { new: true }).exec();
