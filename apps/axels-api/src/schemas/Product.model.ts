@@ -44,6 +44,11 @@ const ProductSchema = new Schema(
 			required: true,
 		},
 
+		productStock: {
+			type: Number,
+			required: true,
+		},
+
 		productViews: {
 			type: Number,
 			default: 0,

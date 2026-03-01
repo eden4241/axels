@@ -25,6 +25,12 @@ const OrderSchema = new Schema(
 			required: true,
 			ref: 'Member',
 		},
+
+        orderItems: [{
+            productId: { type: Schema.Types.ObjectId, ref: 'Product' },
+            itemQuantity: { type: Number, required: true },
+            itemPrice: { type: Number, required: true },
+          }]
 	},
 	{ timestamps: true, collection: 'orders' },
 );

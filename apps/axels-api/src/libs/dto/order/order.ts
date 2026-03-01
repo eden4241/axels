@@ -1,10 +1,27 @@
 import { ObjectType, Field } from '@nestjs/graphql';
 import { OrderStatus } from '../../enums/order.enum';
+import { ObjectId } from 'mongoose';
+import { Product } from '../product/product';
+
+@ObjectType()
+export class OrderItem {
+	@Field(() => Number)
+	itemQuantity: number;
+
+	@Field(() => Number)
+	itemPrice: number;
+
+	@Field(() => String)
+	productId: ObjectId;
+
+	@Field(() => Product, { nullable: true })
+	productData?: Product;
+}
 
 @ObjectType()
 export class Order {
-	@Field()
-	_id: string;
+	@Field(() => String)
+	_id: ObjectId;
 
 	@Field(() => Number)
 	orderTotal: number;
@@ -15,13 +32,15 @@ export class Order {
 	@Field(() => OrderStatus)
 	orderStatus: OrderStatus;
 
+	@Field(() => String)
+	memberId: ObjectId;
 
-	memberId?: string;
-
-	@Field()
+	@Field(() => Date)
 	createdAt: Date;
 
-	@Field()
+	@Field(() => Date)
 	updatedAt: Date;
-}
 
+	@Field(() => [OrderItem])
+	orderItems: OrderItem[];
+}

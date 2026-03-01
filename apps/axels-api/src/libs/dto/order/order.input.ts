@@ -1,17 +1,27 @@
-import { InputType, Field } from '@nestjs/graphql';
-import { OrderStatus } from '../../enums/order.enum';
+import { Field, Float, ID, InputType } from "@nestjs/graphql";
+import { ObjectId } from "mongoose";
+
+
+@InputType()
+class OrderItemInput {
+  @Field(() => ID)
+  productId: ObjectId;
+
+  @Field(() => Number)
+  itemQuantity: number;
+
+  @Field(() => Float)
+  itemPrice: number;
+}
 
 @InputType()
 export class OrderInput {
-	@Field(() => Number)
-	orderTotal: number;
+  @Field(() => Float)
+  orderTotal: number;
 
-	@Field(() => Number)
-	orderDelivery: number;
+  @Field(() => Float)
+  orderDelivery: number;
 
-	@Field(() => OrderStatus, { nullable: true })
-	orderStatus?: OrderStatus;
-
-	@Field({ nullable: true })
-	memberId?: string;
+  @Field(() => [OrderItemInput]) // Savatdagi barcha mahsulotlar ro'yxati
+  orderItems: OrderItemInput[];
 }

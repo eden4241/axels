@@ -52,6 +52,11 @@ const MemberSchema = new Schema(
 			type: String,
 		},
 
+		memberOrders: {
+			type: Number,
+			default: 0,
+		},
+
 		memberDesc: {
 			type: String,
 		},
