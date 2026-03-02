@@ -20,6 +20,7 @@ export enum Message {
 	PROVIDE_ALLOWED_FORMAT = 'Please provide jpg, jpeg or png images!',
 	SELF_SUBSCRIPTION_DENIED = 'Self subscription is denied!',
 	COMMENT_ALREADY_EXISTS = 'You have already commented on this item!',
+    PRODUCT_NOT_FOUND = "PRODUCT_NOT_FOUND",
 }
 
 export enum Direction {

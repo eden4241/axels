@@ -2,6 +2,7 @@ import { ObjectType, Field } from '@nestjs/graphql';
 import { OrderStatus } from '../../enums/order.enum';
 import { ObjectId } from 'mongoose';
 import { Product } from '../product/product';
+import { TotalCounter } from '../member/member';
 
 @ObjectType()
 export class OrderItem {
@@ -43,4 +44,15 @@ export class Order {
 
 	@Field(() => [OrderItem])
 	orderItems: OrderItem[];
+}
+
+
+
+@ObjectType()
+export class Orders {
+	@Field(() => [Order])
+	list: Order[];
+
+	@Field(() => [TotalCounter], { nullable: true })
+	metaCounter: TotalCounter[];
 }

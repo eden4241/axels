@@ -35,6 +35,12 @@ export class ProductInput {
 	productSize: ProductSize;
 
 	@IsNotEmpty()
+	@Min(0)
+	@Type(() => Number)
+	@Field(() => Number)
+	productStock: number;
+
+	@IsNotEmpty()
 	@Length(3, 100)
 	@Field(() => String)
 	productTitle: string;

@@ -42,6 +42,9 @@ export class Product {
 	@Field(() => Int)
 	productRank: number;
 
+	@Field(() => Int)
+	productStock: number;
+
 	@Field(() => [String])
 	productImages: string[];
 
@@ -56,9 +59,6 @@ export class Product {
 
 	@Field(() => Date, { nullable: true })
 	deletedAt?: Date;
-
-	@Field(() => Date, { nullable: true })
-	constructedAt?: Date;
 
 	@Field(() => Date)
 	createdAt: Date;
