@@ -15,6 +15,7 @@ export class FaqResolver {
 	@UseGuards(RolesGuard)
 	@Mutation(() => Faq)
 	public async createFaq(@Args('input') input: FAQInput): Promise<Faq> {
+        console.log('Mutations: createFaq');
 		return await this.faqService.createFaq(input);
 	}
 
@@ -22,19 +23,22 @@ export class FaqResolver {
 	@UseGuards(RolesGuard)
 	@Mutation(() => Faq)
 	public async updateFaq(@Args('input') input: FAQUpdate): Promise<Faq> {
+		console.log('Mutations: updateFaq');
 		return await this.faqService.updateFaq(input);
 	}
 
 	@Roles(MemberType.ADMIN)
 	@UseGuards(RolesGuard)
 	@Mutation(() => Boolean)
-	public async deleteFaq(@Args('id') id: string): Promise<boolean> {
+	public async deleteFaq(@Args('input') id: string): Promise<boolean> {
+		console.log('Mutations: deleteFaq');
 		return await this.faqService.deleteFaq(id);
 	}
 
 	// faq.resolver.ts ichiga qo'shing
 	@Query(() => [Faq],) // [Faq] massiv qaytishini bildiradi
 	public async getAllFaqs(): Promise<Faq[]> {
+		console.log('Queries: getAllFaqs');
 		return await this.faqService.getAllFaqs();
 	}
 }

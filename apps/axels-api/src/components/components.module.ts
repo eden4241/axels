@@ -10,6 +10,7 @@ import { LikeModule } from './like/like.module';
 import { CartModule } from './cart/cart.module';
 import { OrderModule } from './order/order.module';
 import { FaqModule } from './faq/faq.module';
+import { ContactModule } from './contact/contact.module';
 
 @Module({
 	imports: [
@@ -24,6 +25,7 @@ import { FaqModule } from './faq/faq.module';
 		CartModule,
 		OrderModule,
 		FaqModule,
+		ContactModule,
 	],
 })
 export class ComponentsModule {}
