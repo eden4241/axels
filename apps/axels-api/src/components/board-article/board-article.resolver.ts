@@ -49,7 +49,7 @@ export class BoardArticleResolver {
         return await this.boardArticleService.updateBoardArticle(memberId, input);
     }
 
-    @UseGuards(AuthGuard)
+    @UseGuards(WithoutGuard)
     @Query((returns) => BoardArticles)
     public async getBoardArticles(
         @Args('input') input: BoardArticlesInquiry,
